@@ -6,21 +6,25 @@ public class Menu
 
     public bool IsActive { get; set; }
 
-    public Menu()
+    public Menu( Renderer aRenderer )
     {
+        renderer = aRenderer;
         IsActive = true;
 
         for (int i = 0; i < buttons.Length; ++i)
         {
             buttons[i] = new Button();
             buttons[i].type = (ButtonType)i;
-            buttons[i].rectangle = new Rectangle( 100, 100 + i * 70, 200, 50 );
+            buttons[i].rectangle = new Renderer.Rectangle( 100, 100 + i * 70, 200, 50 );
         }
     }
 
     public void Draw()
     {
-
+        foreach (var button in buttons)
+        {
+            renderer.DrawRectangle( button.rectangle );
+        }
     }
 
     public bool IsCursorOverButton( int cursorX, int cursorY, ButtonType buttonType )
@@ -43,23 +47,10 @@ public class Menu
     private class Button
     {
         public ButtonType type;
-        public Rectangle rectangle;
+        public Renderer.Rectangle rectangle;
     }
-
-    private struct Rectangle
-    {
-        public Rectangle( int aX, int aY, int aWidth, int aHeight )
-        {
-            x = aX;
-            y = aY;
-            width = aWidth;
-            height = aHeight;
-        }
-
-        public int x, y;
-        public int width, height;
-    }
-
+        
     private Button[] buttons = new Button[ (int)ButtonType.Max ];
+    private readonly Renderer renderer;
 }
 

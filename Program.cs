@@ -18,9 +18,9 @@ class Program : GameWindow
 {
     public static Vector2 screenSize = new Vector2( 700, 650 );
     public static float ScaleFactor { get; private set; }
-    private Menu menu = new Menu();
     private Game game = new Game();
     private Renderer renderer = new Renderer();
+    private Menu menu;
     //private static string workingDirectory;
     //private bool hasAudioDevice = false;
 
@@ -107,7 +107,9 @@ class Program : GameWindow
 
     protected override void OnLoad( EventArgs e )
     {
+        renderer.Init();
         renderer.SetViewport(0, 0, Width, Height);
+        menu = new Menu( renderer );
     }
 
     protected override void OnUnload( EventArgs e )
