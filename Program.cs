@@ -2,7 +2,7 @@
  * Flappy Clone
  * 
  * Author: Timo Wiren
- * Date: 2014-11-20
+ * Date: 2014-11-22
  **/
 using System;
 using System.IO;
@@ -16,16 +16,8 @@ using OpenTK.Input;
 
 class Program : GameWindow
 {
-    public static Vector2 screenSize = new Vector2( 700, 650 );
-    public static float ScaleFactor { get; private set; }
-    private Game game = new Game();
-    private Renderer renderer = new Renderer();
-    private Menu menu;
-    //private static string workingDirectory;
-    //private bool hasAudioDevice = false;
-
     public Program() : 
-      base( 1024, 768, GraphicsMode.Default, "Game", 0, DisplayDevice.Default, 3, 3, GraphicsContextFlags.ForwardCompatible )
+        base( width, height, GraphicsMode.Default, "Game", 0, DisplayDevice.Default, 3, 3, GraphicsContextFlags.ForwardCompatible )
     {
         WindowBorder = WindowBorder.Fixed;
         VSync = VSyncMode.On;
@@ -76,30 +68,27 @@ class Program : GameWindow
         
     private void MouseUpHandler( object sender, MouseButtonEventArgs buttonEvent )
     {
-        int div = IsRetina() ? 2 : 1;
+        int div = IsRetina() ? 1 : 1;
         int x = buttonEvent.X / div;
         int y = buttonEvent.Y / div;
 
-        Console.WriteLine("Testing button1: " + x + ", " + y);
-
-        if (menu.IsActive)
+        if (gameState == GameState.Menu && buttonEvent.Button == MouseButton.Left)
         {
-            if (buttonEvent.Button == MouseButton.Button1)
+            if (menu.IsCursorOverButton(x, y, Menu.ButtonType.NewGame))
             {
-                Console.WriteLine("Testing button1: " + buttonEvent.X + ", " + buttonEvent.Y);
-                if (menu.IsCursorOverButton(x, y, Menu.ButtonType.NewGame))
-                {
-                    Console.WriteLine("new game");
-                    menu.IsActive = false;
-                    game.IsActive = true;
-                }
+                gameState = GameState.Game;
             }
         }
     }
 
     private void KeyUpHandler( object sender, KeyboardKeyEventArgs args )
     {
-        if (args.Key == Key.Escape)
+        if (args.Key == Key.Escape && gameState == GameState.Game)
+        {
+            gameState = GameState.Menu;
+        }
+
+        if (args.Key == Key.Escape && gameState == GameState.Menu)
         {
             Exit();
         }
@@ -107,8 +96,7 @@ class Program : GameWindow
 
     protected override void OnLoad( EventArgs e )
     {
-        renderer.Init();
-        renderer.SetViewport(0, 0, Width, Height);
+        renderer.Init( Width, Height );
         menu = new Menu( renderer );
     }
 
@@ -130,16 +118,17 @@ class Program : GameWindow
     {
         renderer.ClearScreen();
 
-        if (menu.IsActive)
+        if (gameState == GameState.Menu)
         {
             menu.Draw();
         }
 
-        if (game.IsActive)
+        if (gameState == GameState.Game)
         {
             game.Draw();
         }
 
+        //renderer.DrawText("mutsis", 0, 0, 1);
         renderer.ErrorCheck();
         SwapBuffers();
     }
@@ -181,4 +170,16 @@ class Program : GameWindow
 
         program.Run(60.0);
     }
+
+    public static float ScaleFactor { get; private set; }
+    private const int width = 1024;
+    private const int height = 768;
+    private static Vector2 screenSize = new Vector2( width, height );
+    private enum GameState { Menu, Game }
+    private GameState gameState = GameState.Menu;
+    private Game game = new Game();
+    private Renderer renderer = new Renderer();
+    private Menu menu;
+    //private static string workingDirectory;
+    //private bool hasAudioDevice = false;
 }

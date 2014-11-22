@@ -4,18 +4,15 @@ public class Menu
 {
     public enum ButtonType { NewGame, HighScores, Quit, About, Max }
 
-    public bool IsActive { get; set; }
-
     public Menu( Renderer aRenderer )
     {
         renderer = aRenderer;
-        IsActive = true;
 
         for (int i = 0; i < buttons.Length; ++i)
         {
             buttons[i] = new Button();
             buttons[i].type = (ButtonType)i;
-            buttons[i].rectangle = new Renderer.Rectangle( 100, 100 + i * 70, 200, 50 );
+            buttons[i].rectangle = new Renderer.Rectangle( 400, 100 + i * 120, 300, 100 );
         }
     }
 
@@ -31,8 +28,8 @@ public class Menu
     {
         foreach (var button in buttons)
         {
-            bool xOk = cursorX >= button.rectangle.x && cursorX < button.rectangle.width;
-            bool yOk = cursorY >= button.rectangle.y && cursorY < button.rectangle.height;
+            bool xOk = cursorX >= button.rectangle.x && cursorX < button.rectangle.x + button.rectangle.width;
+            bool yOk = cursorY >= button.rectangle.y && cursorY < button.rectangle.y + button.rectangle.height;
             bool typeOk = buttonType == button.type;
 
             if (xOk && yOk && typeOk)

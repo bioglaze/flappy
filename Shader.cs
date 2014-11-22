@@ -8,7 +8,7 @@ public class Shader
     public enum Uniform
     {
         ProjectionMatrix = 0,
-        Translation = 1,
+        ScaleAndTranslation = 1,
         count
     }
 
@@ -66,7 +66,7 @@ public class Shader
         Console.WriteLine( programInfoLog );
 
         uniforms[ (int)Uniform.ProjectionMatrix ] = GL.GetUniformLocation( program, "uProjectionMatrix" );
-        uniforms[ (int)Uniform.Translation ] = GL.GetUniformLocation( program, "uTranslation" );
+        uniforms[ (int)Uniform.ScaleAndTranslation ] = GL.GetUniformLocation( program, "uScaleAndTranslation" );
     }
 
     public void SetMatrix( ref Matrix4 aMatrix, Uniform aName )
@@ -82,6 +82,11 @@ public class Shader
     public void SetVector( Vector2 v, Uniform aName )
     {
         GL.Uniform2( uniforms[ (int)aName ], v );
+    }
+
+    public void SetVector( Vector4 v, Uniform aName )
+    {
+        GL.Uniform4( uniforms[ (int)aName ], v );
     }
 
     public void Use()
