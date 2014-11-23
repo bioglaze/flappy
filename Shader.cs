@@ -1,4 +1,8 @@
-﻿using System;
+﻿/**
+ * Author: Timo Wiren
+ * Date: 2014-11-22
+ **/
+using System;
 using System.IO;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
@@ -92,6 +96,11 @@ public class Shader
     public void Use()
     {
         GL.UseProgram( program );
+    }
+
+    public int Program()
+    {
+        return program;
     }
 
     private int program;

@@ -1,4 +1,10 @@
-﻿using System;
+﻿/**
+ * Flappy Clone
+ * 
+ * Author: Timo Wiren
+ * Date: 2014-11-23
+ **/
+using System;
 
 public class Menu
 {
@@ -12,7 +18,8 @@ public class Menu
         {
             buttons[i] = new Button();
             buttons[i].type = (ButtonType)i;
-            buttons[i].rectangle = new Renderer.Rectangle( 400, 100 + i * 120, 300, 100 );
+            buttons[i].rectangle = new Renderer.Rectangle( 600, 200 + i * 120, 350, 100 );
+            buttons[i].label = buttonLabels[i];
         }
     }
 
@@ -20,7 +27,9 @@ public class Menu
     {
         foreach (var button in buttons)
         {
+            float marginX = 10;
             renderer.DrawRectangle( button.rectangle );
+            renderer.DrawText(button.label, button.rectangle.x + marginX, button.rectangle.y, 2);
         }
     }
 
@@ -45,9 +54,11 @@ public class Menu
     {
         public ButtonType type;
         public Renderer.Rectangle rectangle;
+        public string label;
     }
         
     private Button[] buttons = new Button[ (int)ButtonType.Max ];
+    private string[] buttonLabels = { "New Game", "High Scores", "About", "Quit" };
     private readonly Renderer renderer;
 }
 

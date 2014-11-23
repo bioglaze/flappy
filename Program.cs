@@ -2,7 +2,7 @@
  * Flappy Clone
  * 
  * Author: Timo Wiren
- * Date: 2014-11-22
+ * Date: 2014-11-23
  **/
 using System;
 using System.IO;
@@ -78,6 +78,10 @@ class Program : GameWindow
             {
                 gameState = GameState.Game;
             }
+            else if (menu.IsCursorOverButton(x, y, Menu.ButtonType.Quit))
+            {
+                Exit();
+            }
         }
     }
 
@@ -128,16 +132,10 @@ class Program : GameWindow
             game.Draw();
         }
 
-        //renderer.DrawText("mutsis", 0, 0, 1);
         renderer.ErrorCheck();
         SwapBuffers();
     }
 
-    private void LoadAssets()
-    {
-        //Matrix4 orthoMatrix = Matrix4.CreateOrthographic(Width, Height, 0, 1);
-    }
-        
     private static bool IsRetina()
     {
         return ScaleFactor > 1.999f;

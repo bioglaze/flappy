@@ -1,4 +1,8 @@
-﻿using System;
+﻿/**
+ * Author: Timo Wiren
+ * Date: 2014-11-22
+ **/
+using System;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,7 +17,6 @@ public class Fonter
         public int xOffset, yOffset;
         public int xAdvance;
     }
-
 
     private Vector2 spacing;
     private Vector4 padding;
@@ -34,7 +37,7 @@ public class Fonter
             Character ch = characters[ (int)text[ i ] ];
 
             float offx = x + ch.xOffset * scale + accumX * scale;
-            float offy = -(y + ch.yOffset * scale);
+            float offy = y + ch.yOffset * scale;
 
             accumX += ch.xAdvance;
 
@@ -47,16 +50,15 @@ public class Fonter
             // Upper triangle.
             geom[ i * 6 + 0 ] = new Vector4( offx, offy, u0, v1 );
             geom[ i * 6 + 1 ] = new Vector4( offx + ch.width * scale, offy, u1, v1 );
-            geom[ i * 6 + 2 ] = new Vector4( offx, offy - ch.height * scale, u0, v0 );
+            geom[ i * 6 + 2 ] = new Vector4( offx, offy + ch.height * scale, u0, v0 );
             // Lower triangle.
             geom[ i * 6 + 3 ] = new Vector4( offx + ch.width * scale, offy, u1, v1 );
-            geom[ i * 6 + 4 ] = new Vector4( offx + ch.width * scale, offy - ch.height * scale, u1, v0 );
-            geom[ i * 6 + 5 ] = new Vector4( offx, offy - ch.height * scale, u0, v0 );
+            geom[ i * 6 + 4 ] = new Vector4( offx + ch.width * scale, offy + ch.height * scale, u1, v0 );
+            geom[ i * 6 + 5 ] = new Vector4( offx, offy + ch.height * scale, u0, v0 );
         }
 
         return geom;
     }
-
 
     public void LoadBMFontMetaText( string path )
     {
@@ -76,7 +78,6 @@ public class Fonter
         ParseCommonLine( metaFileLines[ 1 ] );
         ParseChars( metaFileLines );
     }
-
 
     private void ParseChars( string[] lines )
     {
@@ -131,12 +132,9 @@ public class Fonter
 
             }
 
-            //Console.WriteLine( "x: " + character.x + ", y: " + character.y + ", width: " + character.width + ", height: " + character.height );
-            //Console.WriteLine( "xoffset: " + character.xOffset + ", yoffset: " + character.yOffset + ", xadvance: " + character.xAdvance );
             characters[ id ] = character;
         }
     }
-
 
     private void ParseCommonLine( string commonLine )
     {
@@ -161,7 +159,6 @@ public class Fonter
             }
         }
     }
-
 
     private void ParseInfoLine( string infoLine )
     {
