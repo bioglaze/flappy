@@ -1,4 +1,8 @@
 ﻿/**
+ * Fonter - Creates geometry from text based on BMFont ASCII metadata.
+ * 
+ * Assumes that projection matrix has been created using Matrix4.CreateOrthographicOffCenter().
+ * 
  * Author: Timo Wiren
  * Date: 2014-11-22
  **/

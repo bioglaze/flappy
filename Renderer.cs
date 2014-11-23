@@ -6,10 +6,18 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Graphics;
+
 using OpenTK;
 
 public class Renderer
 {
+    public class Texture
+    {
+        public int id;
+        public int width, height;
+    }
+
     public struct Rectangle
     {
         public Rectangle( int aX, int aY, int aWidth, int aHeight )
@@ -27,7 +35,7 @@ public class Renderer
     public void Init( int width, int height )
     {
         GL.Viewport( 0, 0, width, height );
-
+        GL.ClearColor(new Color4(0.8f, 0.8f, 1.0f, 1.0f));
         CreateQuadBuffer();
 
         Matrix4 orthoMatrix = Matrix4.CreateOrthographicOffCenter(0, width, height, 0, 0, 1);
@@ -35,12 +43,15 @@ public class Renderer
         unlitColor.Use();
         unlitColor.SetMatrix(ref orthoMatrix, Shader.Uniform.ProjectionMatrix);
 
-        buttonTextureId = LoadTexture( "Assets/white.png" );
-
         fonter.LoadBMFontMetaText( "Assets/font.fnt" );
-        fontTextureId = LoadTexture( "Assets/font.png" );
+        fontTexture = LoadTexture( "Assets/font.png" );
         fontVBO = GL.GenBuffer();
         fontVAO = GL.GenVertexArray();
+    }
+
+    public void BindTexture( Texture texture )
+    {
+        GL.BindTexture(TextureTarget.Texture2D, texture.id);
     }
 
     public void ClearScreen()
@@ -48,14 +59,19 @@ public class Renderer
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
     }
 
+    // Use negative size for mirroring sprites.
     public void DrawRectangle( Rectangle rectangle )
     {
         unlitColor.SetVector( new Vector4( rectangle.width, rectangle.height, rectangle.x, rectangle.y ), Shader.Uniform.ScaleAndTranslation );
         const int quadVertexCount = 6;
         BindVAO(quadVAO);
-        GL.BindTexture( TextureTarget.Texture2D, buttonTextureId );
+
+        GL.Enable(EnableCap.Blend);
+        GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
         GL.DrawArrays(PrimitiveType.Triangles, 0, quadVertexCount);
+
+        GL.Disable(EnableCap.Blend);
     }
 
     public void DrawText( string text, float x, float y, float scale )
@@ -72,7 +88,7 @@ public class Renderer
         GL.VertexAttribPointer( 0, 4, VertexAttribPointerType.Float, false, Vector4.SizeInBytes, 0 );
         GL.EnableVertexAttribArray( 0 );
 
-        GL.BindTexture( TextureTarget.Texture2D, fontTextureId );
+        GL.BindTexture( TextureTarget.Texture2D, fontTexture.id );
         GL.ValidateProgram(unlitColor.Program());
 
         GL.Enable(EnableCap.Blend);
@@ -93,16 +109,18 @@ public class Renderer
         }        
     }
 
-    public int LoadTexture( string fileName )
+    public Texture LoadTexture( string fileName )
     {
+        Texture outTexture = new Texture();
+
         if (!System.IO.File.Exists( fileName ))
         {
             Console.WriteLine( "File not found: " + fileName );
-            return 0;
+            return outTexture;
         }
 
-        int id = GL.GenTexture();
-        GL.BindTexture(TextureTarget.Texture2D, id);
+        outTexture.id = GL.GenTexture();
+        GL.BindTexture(TextureTarget.Texture2D, outTexture.id);
 
         Bitmap bmp;
 
@@ -113,10 +131,12 @@ public class Renderer
         catch (System.IO.FileNotFoundException e)
         {
             Console.WriteLine( e.Message );
-            return 0;
+            return outTexture;
         }
 
         BitmapData bmp_data = bmp.LockBits(new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        outTexture.width = bmp_data.Width;
+        outTexture.height = bmp_data.Height;
 
         GL.TexParameter( TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest );
         GL.TexParameter( TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest );
@@ -128,7 +148,17 @@ public class Renderer
 
         bmp.UnlockBits(bmp_data);
 
-        return id;
+        return outTexture;
+    }
+
+    public float Width()
+    {
+        return windowSize.X;
+    }
+
+    public float Height()
+    {
+        return windowSize.Y;
     }
 
     private void CreateQuadBuffer()
@@ -170,11 +200,11 @@ public class Renderer
     private Shader unlitColor = new Shader();
     private int quadVBO;
     private int quadVAO;
-    private int buttonTextureId;
     private Fonter fonter = new Fonter();
-    private int fontTextureId;
+    private Texture fontTexture;
     private int fontVBO;
     private int fontVAO;
     private int currentVAO;
+    private Vector2 windowSize = new Vector2( 640, 480 );
 }
 

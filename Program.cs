@@ -3,6 +3,11 @@
  * 
  * Author: Timo Wiren
  * Date: 2014-11-23
+ * 
+ * Note: Developed on a Retina MacBook Pro, not tested on non-retina resolution.
+ * 
+ * Note: Xamarin Studio seems to currently have a bug that prevents me from adding Assets folder
+ *       into the project, so if you build the project, copy it manually to the bin/Debug folder.
  **/
 using System;
 using System.IO;
@@ -17,7 +22,7 @@ using OpenTK.Input;
 class Program : GameWindow
 {
     public Program() : 
-        base( width, height, GraphicsMode.Default, "Game", 0, DisplayDevice.Default, 3, 3, GraphicsContextFlags.ForwardCompatible )
+        base( width, height, GraphicsMode.Default, "Flappy Clone", 0, DisplayDevice.Default, 3, 3, GraphicsContextFlags.ForwardCompatible )
     {
         WindowBorder = WindowBorder.Fixed;
         VSync = VSyncMode.On;
@@ -77,6 +82,7 @@ class Program : GameWindow
             if (menu.IsCursorOverButton(x, y, Menu.ButtonType.NewGame))
             {
                 gameState = GameState.Game;
+                game.StartNewGame();
             }
             else if (menu.IsCursorOverButton(x, y, Menu.ButtonType.Quit))
             {
@@ -92,6 +98,11 @@ class Program : GameWindow
             gameState = GameState.Menu;
         }
 
+        if (args.Key == Key.Space && gameState == GameState.Game)
+        {
+            game.ApplyFlap();
+        }
+
         if (args.Key == Key.Escape && gameState == GameState.Menu)
         {
             Exit();
@@ -102,6 +113,7 @@ class Program : GameWindow
     {
         renderer.Init( Width, Height );
         menu = new Menu( renderer );
+        game = new Game( renderer );
     }
 
     protected override void OnUnload( EventArgs e )
@@ -115,7 +127,10 @@ class Program : GameWindow
 
     protected override void OnUpdateFrame( FrameEventArgs e )
     {
-        //if (MatchFree.Utils.stopWatch.ElapsedMilliseconds - lastActionMs > 500)
+        if (gameState == GameState.Game)
+        {
+            game.Simulate(e.Time);
+        }
     }
 
     protected override void OnRenderFrame( FrameEventArgs e )
@@ -170,12 +185,12 @@ class Program : GameWindow
     }
 
     public static float ScaleFactor { get; private set; }
-    private const int width = 1024;
-    private const int height = 768;
+    private const int width = 512;
+    private const int height = 384;
     private static Vector2 screenSize = new Vector2( width, height );
     private enum GameState { Menu, Game }
     private GameState gameState = GameState.Menu;
-    private Game game = new Game();
+    private Game game;
     private Renderer renderer = new Renderer();
     private Menu menu;
     //private static string workingDirectory;

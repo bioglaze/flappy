@@ -13,12 +13,13 @@ public class Menu
     public Menu( Renderer aRenderer )
     {
         renderer = aRenderer;
+        buttonTexture = renderer.LoadTexture( "Assets/white.png" );
 
         for (int i = 0; i < buttons.Length; ++i)
         {
             buttons[i] = new Button();
             buttons[i].type = (ButtonType)i;
-            buttons[i].rectangle = new Renderer.Rectangle( 600, 200 + i * 120, 350, 100 );
+            buttons[i].rectangle = new Renderer.Rectangle( 400, 200 + i * 120, 350, 100 );
             buttons[i].label = buttonLabels[i];
         }
     }
@@ -28,6 +29,7 @@ public class Menu
         foreach (var button in buttons)
         {
             float marginX = 10;
+            renderer.BindTexture( buttonTexture );
             renderer.DrawRectangle( button.rectangle );
             renderer.DrawText(button.label, button.rectangle.x + marginX, button.rectangle.y, 2);
         }
@@ -57,6 +59,7 @@ public class Menu
         public string label;
     }
         
+    private Renderer.Texture buttonTexture;
     private Button[] buttons = new Button[ (int)ButtonType.Max ];
     private string[] buttonLabels = { "New Game", "High Scores", "About", "Quit" };
     private readonly Renderer renderer;
