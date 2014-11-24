@@ -34,6 +34,8 @@ public class Renderer
 
     public void Init( int width, int height )
     {
+        windowSize = new Vector2( width, height );
+
         GL.Viewport( 0, 0, width, height );
         GL.ClearColor(new Color4(0.8f, 0.8f, 1.0f, 1.0f));
         CreateQuadBuffer();
@@ -77,6 +79,7 @@ public class Renderer
     public void DrawText( string text, float x, float y, float scale )
     {
         unlitColor.SetVector( new Vector4( 1, 1, 0, 0 ), Shader.Uniform.ScaleAndTranslation );
+        unlitColor.SetVector( new Vector4( 0, 0, 0, 1 ), Shader.Uniform.TintColor );
 
         Vector4[] fontGeom = fonter.CreateGeometry( text, x, y, scale );
 
@@ -95,6 +98,7 @@ public class Renderer
         GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
         GL.DrawArrays( PrimitiveType.Triangles, 0, fontGeom.Length );
+        unlitColor.SetVector( new Vector4( 1, 1, 1, 1 ), Shader.Uniform.TintColor );
 
         GL.Disable(EnableCap.Blend);
     }

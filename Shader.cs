@@ -13,6 +13,7 @@ public class Shader
     {
         ProjectionMatrix = 0,
         ScaleAndTranslation = 1,
+        TintColor = 2,
         count
     }
 
@@ -61,8 +62,6 @@ public class Shader
         GL.AttachShader( program, vShader );
         GL.AttachShader( program, fShader );
 
-        GL.BindAttribLocation( program, 0, "aPosition" );
-
         GL.LinkProgram( program );
 
         string programInfoLog;
@@ -71,6 +70,7 @@ public class Shader
 
         uniforms[ (int)Uniform.ProjectionMatrix ] = GL.GetUniformLocation( program, "uProjectionMatrix" );
         uniforms[ (int)Uniform.ScaleAndTranslation ] = GL.GetUniformLocation( program, "uScaleAndTranslation" );
+        uniforms[ (int)Uniform.TintColor ] = GL.GetUniformLocation( program, "tintColor" );
     }
 
     public void SetMatrix( ref Matrix4 aMatrix, Uniform aName )

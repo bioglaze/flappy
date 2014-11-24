@@ -2,24 +2,24 @@
  * Flappy Clone
  * 
  * Author: Timo Wiren
- * Date: 2014-11-23
+ * Date: 2014-11-24
  **/
 using System;
 
 public class Menu
 {
-    public enum ButtonType { NewGame, HighScores, Quit, About, Max }
+    public enum ButtonType { NewGame, Quit, Max }
 
     public Menu( Renderer aRenderer )
     {
         renderer = aRenderer;
-        buttonTexture = renderer.LoadTexture( "Assets/white.png" );
+        buttonTexture = renderer.LoadTexture( "Assets/button.png" );
 
         for (int i = 0; i < buttons.Length; ++i)
         {
             buttons[i] = new Button();
             buttons[i].type = (ButtonType)i;
-            buttons[i].rectangle = new Renderer.Rectangle( 400, 200 + i * 120, 350, 100 );
+            buttons[i].rectangle = new Renderer.Rectangle( 300, 200 + i * 120, 350, 100 );
             buttons[i].label = buttonLabels[i];
         }
     }
@@ -28,10 +28,11 @@ public class Menu
     {
         foreach (var button in buttons)
         {
-            float marginX = 10;
+            float marginX = 50;
+            float marginY = 20;
             renderer.BindTexture( buttonTexture );
             renderer.DrawRectangle( button.rectangle );
-            renderer.DrawText(button.label, button.rectangle.x + marginX, button.rectangle.y, 2);
+            renderer.DrawText(button.label, button.rectangle.x + marginX, button.rectangle.y + marginY, 2);
         }
     }
 
@@ -61,7 +62,7 @@ public class Menu
         
     private Renderer.Texture buttonTexture;
     private Button[] buttons = new Button[ (int)ButtonType.Max ];
-    private string[] buttonLabels = { "New Game", "High Scores", "About", "Quit" };
+    private string[] buttonLabels = { "New Game", "Quit" };
     private readonly Renderer renderer;
 }
 

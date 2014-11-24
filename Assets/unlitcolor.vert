@@ -4,7 +4,7 @@ uniform mat4 uProjectionMatrix;
 uniform vec4 uScaleAndTranslation;
 
 // .zw contains UV
-in vec4 aPosition;
+layout (location = 0) in vec4 aPosition;
 out vec2 vUV;
 
 void main()

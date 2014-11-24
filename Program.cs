@@ -100,6 +100,11 @@ class Program : GameWindow
 
         if (args.Key == Key.Space && gameState == GameState.Game)
         {
+            if (game.IsPaused())
+            {
+                game.Play();
+            }
+
             game.ApplyFlap();
         }
 
