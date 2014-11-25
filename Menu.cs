@@ -2,14 +2,13 @@
  * Flappy Clone
  * 
  * Author: Timo Wiren
- * Date: 2014-11-24
+ * Date: 2014-11-25
  **/
 using System;
+using OpenTK;
 
 public class Menu
 {
-    public enum ButtonType { NewGame, Quit, Max }
-
     public Menu( Renderer aRenderer )
     {
         renderer = aRenderer;
@@ -17,8 +16,8 @@ public class Menu
 
         for (int i = 0; i < buttons.Length; ++i)
         {
-            buttons[i] = new Button();
-            buttons[i].type = (ButtonType)i;
+            buttons[i] = new Renderer.Button();
+            buttons[i].type = (Renderer.ButtonType)i;
             buttons[i].rectangle = new Renderer.Rectangle( 300, 200 + i * 120, 350, 100 );
             buttons[i].label = buttonLabels[i];
         }
@@ -31,20 +30,18 @@ public class Menu
             float marginX = 50;
             float marginY = 20;
             renderer.BindTexture( buttonTexture );
-            renderer.DrawRectangle( button.rectangle );
+            renderer.DrawRectangle( button.rectangle, button.tintColor );
             renderer.DrawText(button.label, button.rectangle.x + marginX, button.rectangle.y + marginY, 2);
         }
     }
 
-    public bool IsCursorOverButton( int cursorX, int cursorY, ButtonType buttonType )
+    public bool IsCursorOverButton( int cursorX, int cursorY, Renderer.ButtonType buttonType )
     {
         foreach (var button in buttons)
         {
-            bool xOk = cursorX >= button.rectangle.x && cursorX < button.rectangle.x + button.rectangle.width;
-            bool yOk = cursorY >= button.rectangle.y && cursorY < button.rectangle.y + button.rectangle.height;
             bool typeOk = buttonType == button.type;
 
-            if (xOk && yOk && typeOk)
+            if (typeOk && button.IsCursorInside(cursorX, cursorY))
             {
                 return true;
             }
@@ -53,16 +50,17 @@ public class Menu
         return false;
     }
 
-    private class Button
+    public void UpdateButtonHoverHighlights(int cursorX, int cursorY)
     {
-        public ButtonType type;
-        public Renderer.Rectangle rectangle;
-        public string label;
+        foreach (var button in buttons)
+        {
+            button.tintColor = button.IsCursorInside(cursorX, cursorY) ? new Vector4(0.8f, 0.8f, 1, 1) : Vector4.One;
+        }   
     }
-        
-    private Renderer.Texture buttonTexture;
-    private Button[] buttons = new Button[ (int)ButtonType.Max ];
+                
+    private Renderer.Button[] buttons = new Renderer.Button[ (int)Renderer.ButtonType.Max ];
     private string[] buttonLabels = { "New Game", "Quit" };
     private readonly Renderer renderer;
+    private Renderer.Texture buttonTexture;
 }
 

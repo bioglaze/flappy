@@ -12,13 +12,30 @@ using OpenTK;
 
 public class Renderer
 {
+    public enum ButtonType { NewGame, Quit, Max }
+
     public class Texture
     {
         public int id;
         public int width, height;
     }
 
-    public struct Rectangle
+    public class Button
+    {
+        public bool IsCursorInside(int cursorX, int cursorY)
+        {
+            bool xOk = cursorX >= rectangle.x && cursorX < rectangle.x + rectangle.width;
+            bool yOk = cursorY >= rectangle.y && cursorY < rectangle.y + rectangle.height;
+            return xOk && yOk;
+        }
+
+        public ButtonType type;
+        public Renderer.Rectangle rectangle;
+        public string label;
+        public Vector4 tintColor = Vector4.One;
+    }
+
+    public class Rectangle
     {
         public Rectangle( int aX, int aY, int aWidth, int aHeight )
         {
@@ -37,7 +54,7 @@ public class Renderer
         windowSize = new Vector2( width, height );
 
         GL.Viewport( 0, 0, width, height );
-        GL.ClearColor(new Color4(0.8f, 0.8f, 1.0f, 1.0f));
+        SetClearColor(new Color4(0.8f, 0.8f, 1.0f, 1.0f));
         CreateQuadBuffer();
 
         Matrix4 orthoMatrix = Matrix4.CreateOrthographicOffCenter(0, width, height, 0, 0, 1);
@@ -55,16 +72,18 @@ public class Renderer
     {
         GL.BindTexture(TextureTarget.Texture2D, texture.id);
     }
-
+        
     public void ClearScreen()
     {
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
     }
 
     // Use negative size for mirroring sprites.
-    public void DrawRectangle( Rectangle rectangle )
+    public void DrawRectangle( Rectangle rectangle, Vector4 color)
     {
         unlitColor.SetVector( new Vector4( rectangle.width, rectangle.height, rectangle.x, rectangle.y ), Shader.Uniform.ScaleAndTranslation );
+        unlitColor.SetVector( color, Shader.Uniform.TintColor );
+
         const int quadVertexCount = 6;
         BindVAO(quadVAO);
 
@@ -74,6 +93,7 @@ public class Renderer
         GL.DrawArrays(PrimitiveType.Triangles, 0, quadVertexCount);
 
         GL.Disable(EnableCap.Blend);
+        unlitColor.SetVector( new Vector4( 1, 1, 1, 1 ), Shader.Uniform.TintColor );
     }
 
     public void DrawText( string text, float x, float y, float scale )
@@ -163,6 +183,11 @@ public class Renderer
     public float Height()
     {
         return windowSize.Y;
+    }
+
+    public void SetClearColor(Color4 color)
+    {
+        GL.ClearColor(color);
     }
 
     private void CreateQuadBuffer()

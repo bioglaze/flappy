@@ -26,6 +26,7 @@ class Program : GameWindow
     {
         WindowBorder = WindowBorder.Fixed;
         VSync = VSyncMode.On;
+        this.MouseDown += MouseDownHandler;
         this.MouseUp += MouseUpHandler;
         this.KeyUp += KeyUpHandler;
         InitAudio();
@@ -70,7 +71,19 @@ class Program : GameWindow
         AL.BufferData(buffer, waveFile.SoundFormat, waveFile.SoundData, waveFile.SoundData.Length, waveFile.SampleRate);
         waveFile.dispose();*/
     }
-        
+   
+    private void MouseDownHandler( object sender, MouseButtonEventArgs buttonEvent )
+    {
+        int div = IsRetina() ? 1 : 1;
+        int x = buttonEvent.X / div;
+        int y = buttonEvent.Y / div;
+
+        if (gameState == GameState.Menu && buttonEvent.Button == MouseButton.Left)
+        {
+            menu.UpdateButtonHoverHighlights( x, y );
+        }
+    }
+
     private void MouseUpHandler( object sender, MouseButtonEventArgs buttonEvent )
     {
         int div = IsRetina() ? 1 : 1;
@@ -79,14 +92,24 @@ class Program : GameWindow
 
         if (gameState == GameState.Menu && buttonEvent.Button == MouseButton.Left)
         {
-            if (menu.IsCursorOverButton(x, y, Menu.ButtonType.NewGame))
+            menu.UpdateButtonHoverHighlights( x, y );
+
+            if (menu.IsCursorOverButton(x, y, Renderer.ButtonType.NewGame))
             {
                 gameState = GameState.Game;
                 game.StartNewGame();
             }
-            else if (menu.IsCursorOverButton(x, y, Menu.ButtonType.Quit))
+            else if (menu.IsCursorOverButton(x, y, Renderer.ButtonType.Quit))
             {
                 Exit();
+            }
+        }
+
+        if (gameState == GameState.Game && buttonEvent.Button == MouseButton.Left)
+        {
+            if (game.IsCursorOverRestartButton(x, y))
+            {
+                game.StartNewGame();
             }
         }
     }
@@ -119,10 +142,6 @@ class Program : GameWindow
         renderer.Init( Width, Height );
         menu = new Menu( renderer );
         game = new Game( renderer );
-    }
-
-    protected override void OnUnload( EventArgs e )
-    {
     }
 
     protected override void OnResize( EventArgs e )
