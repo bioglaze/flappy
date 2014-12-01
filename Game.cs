@@ -2,7 +2,7 @@
  * Flappy Clone
  * 
  * Author: Timo Wiren
- * Date: 2014-11-25
+ * Date: 2014-12-02
  **/
 using System;
 using OpenTK;
@@ -84,6 +84,11 @@ public class Game
     public bool IsPaused()
     {
         return !isPlaying;
+    }
+
+    public bool IsPlayerDead()
+    {
+        return isDead;
     }
 
     public void Play()

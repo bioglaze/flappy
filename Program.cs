@@ -2,7 +2,7 @@
  * Flappy Clone
  * 
  * Author: Timo Wiren
- * Date: 2014-11-23
+ * Date: 2014-11-28
  * 
  * Note: Developed on a Retina MacBook Pro, not tested on non-retina resolution.
  * 
@@ -40,7 +40,7 @@ class Program : GameWindow
             return;
         }
 
-        /*try
+        try
         {
             AudioContext ac = new AudioContext();
             ac.CheckErrors();
@@ -53,23 +53,16 @@ class Program : GameWindow
         }
 
         int buffer = AL.GenBuffer();
-        soundMoveSrc = AL.GenSource();
+        dieSound = AL.GenSource();
 
-        WaveData waveFile = new WaveData(workingDirectory + "/Resources/failed.wav");
+        WaveData waveFile = new WaveData("Assets/failed.wav");
 
         AL.BufferData(buffer, waveFile.SoundFormat, waveFile.SoundData, waveFile.SoundData.Length, waveFile.SampleRate);
         waveFile.dispose();
 
-        AL.Source(soundMoveSrc, ALSourcei.Buffer, buffer);
-        AL.Source(soundMoveSrc, ALSourceb.Looping, false);
-        AL.GenSources(soundMoveSrc);
-
-        buffer = AL.GenBuffer();
-
-        waveFile = new WaveData(workingDirectory + "/Resources/badmove.wav");
-
-        AL.BufferData(buffer, waveFile.SoundFormat, waveFile.SoundData, waveFile.SoundData.Length, waveFile.SampleRate);
-        waveFile.dispose();*/
+        AL.Source(dieSound, ALSourcei.Buffer, buffer);
+        AL.Source(dieSound, ALSourceb.Looping, false);
+        AL.GenSources(dieSound);
     }
    
     private void MouseDownHandler( object sender, MouseButtonEventArgs buttonEvent )
@@ -110,6 +103,7 @@ class Program : GameWindow
             if (game.IsCursorOverRestartButton(x, y))
             {
                 game.StartNewGame();
+                diePlayed = false;
             }
         }
     }
@@ -154,6 +148,12 @@ class Program : GameWindow
         if (gameState == GameState.Game)
         {
             game.Simulate(e.Time);
+
+            if (game.IsPlayerDead() && hasAudioDevice && !diePlayed)
+            {
+                AL.SourcePlay( dieSound );
+                diePlayed = true;
+            }
         }
     }
 
@@ -218,5 +218,7 @@ class Program : GameWindow
     private Renderer renderer = new Renderer();
     private Menu menu;
     //private static string workingDirectory;
-    //private bool hasAudioDevice = false;
+    private bool hasAudioDevice = false;
+    private int dieSound;
+    private bool diePlayed = false;
 }
